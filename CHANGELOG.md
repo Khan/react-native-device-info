@@ -206,6 +206,8 @@
 
 * Add support for `getIpAddress` and `getMacAddress` on iOS (https://github.com/react-native-community/react-native-device-info/commit/41735bd0b2efe1f626afc066604f27073acb9d4c)
 
+* Make Google Play Services optional using the `compileOnly` Gradle directive
+
 ### 0.21.5
 
 * Rolled back the Pod change made in 0.21.1

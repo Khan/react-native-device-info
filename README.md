@@ -817,6 +817,10 @@ const instanceId = DeviceInfo.getInstanceID();
 
 > See https://developers.google.com/instance-id/
 
+This function requires Google Play Services in your app. If you don't want to
+bundle Google Play Services in your app, this function will simply return a
+message stating that GCS is not a dependency.
+
 ---
 
 ### getLastUpdateTime()
