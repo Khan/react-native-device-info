@@ -15,7 +15,11 @@ def safeExtGet(prop, fallback) {
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
 
+def DEFAULT_GOOGLE_PLAY_SERVICES_VERSION    = "+"
+
 android {
+    def googlePlayServicesVersion = project.hasProperty('googlePlayServicesVersion') ? project.googlePlayServicesVersion : DEF    AULT_GOOGLE_PLAY_SERVICES_VERSION
+
     compileSdkVersion safeExtGet('compileSdkVersion', 28)
 
     defaultConfig {
@@ -50,7 +54,7 @@ dependencies {
     def mediaCompatVersion = safeExtGet('mediaCompatVersion', safeExtGet('supportLibVersion', '28.0.0'))
 
     implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
-    implementation "com.google.android.gms:play-services-gcm:${safeExtGet('googlePlayServicesVersion', '16.1.0')}"
+    compileOnly "com.google.android.gms:play-services-gcm:${safeExtGet('googlePlayServicesVersion', '+')}"
     implementation "$appCompatLibName:$supportLibVersion"
     implementation "$supportV4LibName:$supportV4Version"
     implementation "$mediaCompatLibName:$mediaCompatVersion"
