@@ -183,7 +183,8 @@ RCT_EXPORT_MODULE(RNDeviceInfo)
 	// `userAgent` is not used in the Khan Academy app.
 	// For now we'll crash if this is called. In the future we should upgrade
 	// to the non-vendored version of this lib which uses WKWebView.
-	fatalError(@"`userAgent` property is not supported!");
+	NSAssert(NO, @"`userAgent` property is not supported!");
+	return @"not available";
 #endif
 }
 
