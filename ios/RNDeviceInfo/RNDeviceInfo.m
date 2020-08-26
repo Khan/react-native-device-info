@@ -180,8 +180,10 @@ RCT_EXPORT_MODULE(RNDeviceInfo)
 #if TARGET_OS_TV
     return @"not available";
 #else
-    UIWebView* webView = [[UIWebView alloc] initWithFrame:CGRectZero];
-    return [webView stringByEvaluatingJavaScriptFromString:@"navigator.userAgent"];
+	// `userAgent` is not used in the Khan Academy app.
+	// For now we'll crash if this is called. In the future we should upgrade
+	// to the non-vendored version of this lib which uses WKWebView.
+	fatalError(@"`userAgent` property is not supported!");
 #endif
 }
 
