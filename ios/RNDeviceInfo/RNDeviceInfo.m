@@ -178,12 +178,26 @@ RCT_EXPORT_MODULE(RNDeviceInfo)
 - (NSString*) userAgent
 {
 #if TARGET_OS_TV
-    return @"not available";
+    reject(@"not_available_error", @"not available on tvOS", nil);
 #else
-	// `userAgent` is not used in the Khan Academy app.
-	// For now we'll crash if this is called. In the future we should upgrade
-	// to the non-vendored version of this lib which uses WKWebView.
-	fatalError(@"`userAgent` property is not supported!");
+    __weak RNDeviceInfo *weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong RNDeviceInfo *strongSelf = weakSelf;
+        if (strongSelf) {
+            // Save WKWebView (it might deallocate before we ask for user Agent)
+            __block WKWebView *webView = [[WKWebView alloc] init];
+
+            [webView evaluateJavaScript:@"window.navigator.userAgent;" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+                if (error) {
+                    reject(@"getUserAgentError", error.localizedDescription, error);
+                } else {
+                    resolve([NSString stringWithFormat:@"%@", result]);
+                }
+                // Destroy the WKWebView after task is complete
+                webView = nil;
+            }];
+        }
+    });
 #endif
 }
 
@@ -243,7 +257,7 @@ RCT_EXPORT_MODULE(RNDeviceInfo)
 }
 
 - (NSDictionary *) getStorageDictionary {
-	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);  
+	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     return [[NSFileManager defaultManager] attributesOfFileSystemForPath:[paths lastObject] error: nil];
 }
 
@@ -261,7 +275,7 @@ RCT_EXPORT_MODULE(RNDeviceInfo)
 - (uint64_t) freeDiskStorage {
     uint64_t freeSpace = 0;
     NSDictionary *storage = [self getStorageDictionary];
-    
+
     if (storage) {
         NSNumber *freeFileSystemSizeInBytes = [storage objectForKey: NSFileSystemFreeSize];
         freeSpace = [freeFileSystemSizeInBytes unsignedLongLongValue];
@@ -307,7 +321,7 @@ RCT_EXPORT_METHOD(getMacAddress:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
 {
     NSString *address = @"02:00:00:00:00:00";
     resolve(address);
-} 
+}
 
 RCT_EXPORT_METHOD(getIpAddress:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -337,7 +351,7 @@ RCT_EXPORT_METHOD(getIpAddress:(RCTPromiseResolveBlock)resolve rejecter:(RCTProm
     // Free memory
     freeifaddrs(interfaces);
     resolve(address);
-} 
+}
 
 RCT_EXPORT_METHOD(isPinOrFingerprintSet:(RCTResponseSenderBlock)callback)
 {
